@@ -26,17 +26,13 @@ fc-cache -fv
 sudo timedatectl set-timezone Europe/Amsterdam
 
 wget -c https://ftpmirror.gnu.org/emacs/emacs-29.3.tar.gz
-
 sudo apt build-dep emacs -y
-
 tar -xzf emacs-29.3.tar.gz
 cd emacs-29.3
-
 ./configure --with-native-compilation=aot --with-tree-sitter --with-gif --with-png --with-jpeg --with-rsvg --with-tiff --with-imagemagick --with-x-toolkit=lucid --with-json --with-mailutils
 make clean
 make -j8
 
-cd ~
-
 rm -rf ~/src/emacs-29.3
-rm -rf ~/src/dotfiles-main
+
+cd ~
