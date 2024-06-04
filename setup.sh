@@ -154,7 +154,7 @@ cd ~/.config/emacs
 if [ $? -ne 0 ]; then
   echo "Failed to change to emacs config source directory"
   exit 1
-f
+fi
 make clean
 make 
 if [ $? -ne 0 ]; then
