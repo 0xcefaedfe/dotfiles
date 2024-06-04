@@ -1,0 +1,37 @@
+(require 'nano-theme)
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+
+;; define a function to update line number colors
+(defun update-line-number-colors ()
+"Update line number colors based on the current theme."
+(let ((bg-color (face-attribute 'default :background))
+      (fg-color (face-attribute 'default :foreground))
+        (hl-bg-color (face-attribute 'hl-line :background nil 'inherit)))
+    (custom-set-faces
+    `(line-number ((t (:foreground ,bg-color))))
+    `(line-number-current-line ((t (:foreground ,fg-color :background ,hl-bg-color)))))))
+
+(if (and (display-graphic-p) (boundp 'ns-system-appearance))
+    (progn
+      (defun nxt/apply-theme (appearance)
+        "Load theme, taking current system APPEARANCE into consideration."
+        (mapc #'disable-theme custom-enabled-themes)
+        (pcase appearance
+          ('light (nano-frame-light))
+          ('dark (nano-frame-dark))
+          ('nil (nano-frame-dark))))
+
+      (add-hook 'ns-system-appearance-change-functions #'nxt/apply-theme)
+      (nano-mode)
+      (if (eq ns-system-appearance 'light)
+          (nano-light)
+        (nano-dark)))
+  (load-theme 'nano-dark t))
+
+;; initial update of line number colors
+(nano-mode)
+(nano-dark)
+(update-line-number-colors)
+
+(provide 'init-theme)

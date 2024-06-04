@@ -108,7 +108,14 @@ if [ $? -ne 0 ]; then
 fi
 
 # Download and build Emacs
-cd $TMP_DIR/src
+cd $TMP_DIR/src/dotfiles/emacs
+if [ $? -ne 0 ]; then
+  echo "Failed to change to emacs config source directory"
+  exit 1
+fi
+make clean
+make install
+
 wget -c https://ftpmirror.gnu.org/emacs/emacs-29.3.tar.gz
 if [ $? -ne 0 ]; then
   echo "Failed to download Emacs source"
@@ -140,6 +147,21 @@ if [ $? -ne 0 ]; then
   echo "Failed to build Emacs"
   exit 1
 fi
+
+# Install Emacs
+sudo make install
+
+# Install Emacs config
+cd $TMP_DIR/src
+
+# Log in to GitHub
+sudo apt install -y gh
+if [ $? -ne 0 ]; then
+  echo "Failed to install gh"
+  exit 1
+fi
+
+gh auth login
 
 # Return to home directory
 cd ~
