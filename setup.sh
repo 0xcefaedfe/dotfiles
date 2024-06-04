@@ -127,21 +127,21 @@ if [ $? -ne 0 ]; then
 fi
 
 cd emacs-29.3
-# ./configure --with-native-compilation=aot --with-tree-sitter --with-gif --with-png --with-jpeg --with-rsvg --with-tiff --with-imagemagick --with-x-toolkit=lucid --with-json --with-mailutils
+./configure --with-native-compilation=aot --with-tree-sitter --with-gif --with-png --with-jpeg --with-rsvg --with-tiff --with-imagemagick --with-x-toolkit=lucid --with-json --with-mailutils
 if [ $? -ne 0 ]; then
   echo "Failed to configure Emacs"
   exit 1
 fi
 
 make clean
-# make -j8
+make -j8
 if [ $? -ne 0 ]; then
   echo "Failed to build Emacs"
   exit 1
 fi
 
 # Install Emacs
-# sudo make install
+sudo make install
 
 # Install Emacs config
 cd $TMP_DIR/src/dotfiles
@@ -177,4 +177,6 @@ if [ $? -ne 0 ]; then
   echo "Failed to change to home directory"
   exit 1
 fi
+
+echo "Job's done."
 
