@@ -68,7 +68,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install the required packages
-sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev
+sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev litree-sitter-dev
 if [ $? -ne 0 ]; then
   echo "Failed to install required packages"
   exit 1
