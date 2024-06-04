@@ -69,7 +69,7 @@ fi
 
 # Copy configs
 mkdir -p ~/.config
-cp $TMP_DIR/src/dotfiles/config/* ~/.config/ 
+cp -R $TMP_DIR/src/dotfiles/config/* ~/.config/ 
 if [ $? -ne 0 ]; then
   echo "Failed to copy configs" 
   exit 1
