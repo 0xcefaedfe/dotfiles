@@ -67,6 +67,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Copy configs
+mkdir -p ~/.config
+cp $TMP_DIR/src/dotfiles/config/* ~/.config/ 
+if [ $? -ne 0 ]; then
+  echo "Failed to copy configs" 
+  exit 1
+fi
+
 # Install the required packages
 sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev litree-sitter-dev
 if [ $? -ne 0 ]; then
@@ -144,12 +152,6 @@ fi
 sudo make install
 
 # Install Emacs config
-cd $TMP_DIR/src/dotfiles
-cp -R emacs ~/.config
-if [ $? -ne 0 ]; then
-  echo "Failed to copy Emacs config"
-  exit 1
-fi
 cd ~/.config/emacs
 if [ $? -ne 0 ]; then
   echo "Failed to change to emacs config source directory"
