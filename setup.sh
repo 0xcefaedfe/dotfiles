@@ -151,28 +151,6 @@ fi
 # Install Emacs
 sudo make install
 
-# Install Emacs config
-cd ~/.config/emacs
-if [ $? -ne 0 ]; then
-  echo "Failed to change to emacs config source directory"
-  exit 1
-fi
-make clean
-make 
-if [ $? -ne 0 ]; then
-  echo "Failed to install Emacs config"
-  exit 1
-fi
-
-# Log in to GitHub
-sudo apt install -y gh
-if [ $? -ne 0 ]; then
-  echo "Failed to install gh"
-  exit 1
-fi
-
-gh auth login
-
 # Return to home directory
 cd ~
 if [ $? -ne 0 ]; then
