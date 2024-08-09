@@ -76,7 +76,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install the required packages
-sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev xorg xinit
+sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev xorg xinit
 if [ $? -ne 0 ]; then
   echo "Failed to install required packages"
   exit 1
@@ -98,6 +98,27 @@ sudo timedatectl set-timezone Europe/Amsterdam
 if [ $? -ne 0 ]; then
   echo "Failed to set timezone to Europe/Amsterdam"
   exit 1
+fi
+
+mkdir -p ~/.local/share/fonts
+wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
+if [ $? -ne 0 ]; then
+    echo "Failed to download RobotoMono Nerd Font"
+    exit 1
+fi
+
+cd ~/.local/share/fonts
+unzip RobotoMono.zip
+if [ $? -ne 0 ]; then
+    echo "Failed to unzip RobotoMono Nerd Font"
+    exit 1
+fi
+
+rm RobotoMono.zip
+fc-cache -fv
+if [ $? -ne 0 ]; then
+    echo "Failed to refresh font cache"
+    exit 1
 fi
 
 # Download and build Emacs
