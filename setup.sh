@@ -76,7 +76,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install the required packages
-sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev xorg xinit
+sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu wget rxvt-unicode libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev xorg xinit
 if [ $? -ne 0 ]; then
   echo "Failed to install required packages"
   exit 1
@@ -156,6 +156,25 @@ fi
 
 # Install Emacs
 sudo make install
+
+# Copy Emacs config
+mkdir -p ~/.emacs.d/
+cp -R $TMP_DIR/src/dotfiles/emacs/* ~/.emacs.d/
+if [ $? -ne 0 ]; then
+  echo "Failed to copy emacs config" 
+  exit 1
+fi
+
+# Generate ssh key
+ssh-keygen -t ed25519
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+
+# GitHub
+sudo apt install -y gh
+gh auth login
+gh auth refresh -h github.com -s admin:public_key
+gh ssh-key add ~/.ssh/id_ed25519.pub
 
 # Return to home directory
 cd ~
