@@ -2,9 +2,9 @@
 
 # Consult the keyboard(5) manual page.
 
-XKBMODEL="apple_laptop"
 XKBLAYOUT="us"
 XKBVARIANT="dvorak"
-XKBOPTIONS="caps:swapescape,altwin:ctrl_win"
+XKBOPTIONS="ctrl:nocaps"
 
 BACKSPACE="guess"
+XKBMODEL="pc105"

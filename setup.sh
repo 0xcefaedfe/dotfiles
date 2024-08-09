@@ -20,10 +20,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Install git
-sudo apt install -y git
+# Install git and sudo
+sudo apt install -y git sudo
 if [ $? -ne 0 ]; then
-  echo "Failed to install git"
+  echo "Failed to install git or sudo"
   exit 1
 fi
 
@@ -76,37 +76,22 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install the required packages
-sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev
+sudo apt install -y console-setup unzip git neovim firefox-esr i3 dmenu fonts-roboto wget alacritty libmagickwand-dev libjpeg-dev libpng-dev libtiff-dev libgif-dev libx11-dev libxpm-dev libtree-sitter-dev xorg xinit
 if [ $? -ne 0 ]; then
   echo "Failed to install required packages"
   exit 1
 fi
 
-# Check if Roboto Mono is installed and install it if not
-if ! fc-list | grep -i "Roboto Mono" > /dev/null 2>&1; then
-  mkdir -p ~/.local/share/fonts
-  wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/RobotoMono.zip
-  if [ $? -ne 0 ]; then
-    echo "Failed to download RobotoMono Nerd Font"
-    exit 1
-  fi
+# Install Brave browser
+sudo apt install -y curl
 
-  cd ~/.local/share/fonts
-  unzip RobotoMono.zip
-  if [ $? -ne 0 ]; then
-    echo "Failed to unzip RobotoMono Nerd Font"
-    exit 1
-  fi
+sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
 
-  rm RobotoMono.zip
-  fc-cache -fv
-  if [ $? -ne 0 ]; then
-    echo "Failed to refresh font cache"
-    exit 1
-  fi
-else
-  echo "Roboto Mono is already installed"
-fi
+echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main"|sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+
+sudo apt update
+
+sudo apt install -y brave-browser
 
 # Set timezone to Europe/Amsterdam
 sudo timedatectl set-timezone Europe/Amsterdam
@@ -116,7 +101,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Download and build Emacs
-wget -c https://ftpmirror.gnu.org/emacs/emacs-29.3.tar.gz
+wget -c https://ftpmirror.gnu.org/emacs/emacs-29.4.tar.gz
 if [ $? -ne 0 ]; then
   echo "Failed to download Emacs source"
   exit 1
@@ -128,14 +113,14 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-tar -xzf emacs-29.3.tar.gz
+tar -xzf emacs-29.4.tar.gz
 if [ $? -ne 0 ]; then
   echo "Failed to unpack Emacs source"
   exit 1
 fi
 
-cd emacs-29.3
-./configure --with-native-compilation=aot --with-tree-sitter --with-gif --with-png --with-jpeg --with-rsvg --with-tiff --with-imagemagick --with-x-toolkit=lucid --with-json --with-mailutils
+cd emacs-29.4
+./configure --with-native-compilation=aot --with-tree-sitter --with-gif --with-png --with-jpeg --with-rsvg --with-tiff --with-imagemagick --with-x-toolkit=lucid --with-json --with-mailutils --with-wide-int
 if [ $? -ne 0 ]; then
   echo "Failed to configure Emacs"
   exit 1
