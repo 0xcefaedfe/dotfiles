@@ -1,3 +1,11 @@
+;; set up meta key
+(cond
+ ((eq system-type 'darwin)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'none))
+ ((eq system-type 'gnu/linux)
+  (setq x-alt-keysym 'meta)))
+
 ;; set theme early
 (add-to-list 'default-frame-alist '(font . "RobotoMono NerdFont"))
 (add-to-list 'custom-theme-load-path ".")
@@ -5,6 +13,30 @@
 
 ;; silence native compilation warnings
 (setq native-comp-async-report-warnings-errors nil)
+
+(setq auto-save-default nil)
+(setq make-backup-files nil)
+(setq create-lockfiles nil)
+(setq completion-auto-help nil)
+(setq confirm-kill-emacs 'y-or-n-p)
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+(setq visible-bell nil)
+(setq package--init-file-ensured t)
+(setq custom-file "~/.emacs.d/custom.el")
+(setq custom-safe-themes t)
+(prefer-coding-system       'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-language-environment   'utf-8)
+
+;; turn some modes on 
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+(delete-selection-mode)
+(global-auto-revert-mode t)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; eye candy
 (tool-bar-mode 0)
@@ -82,6 +114,32 @@
 
 ;; project.el
 (nxt/require 'project)
+
+(nxt/require 'swift-mode)
+(nxt/require 'reformatter)
+
+;; Swift mode
+(use-package swift-mode
+  :mode ("\\.swift\\;" . swift-mode)
+  :config
+  (setq swift-mode:basic-offset 2)
+  (require 'reformatter)
+  (reformatter-define swift-format
+    :program "swift-format"
+    :args '("format"))
+  (add-hook 'swift-mode-hook 'swift-format-on-save-mode))
+
+;; LSP
+(use-package eglot
+  :hook
+  ;; Enable eglot for swift-mode
+  (swift-mode . eglot-ensure)
+  :config
+    (fset #'jsonrpc--log-event #'ignore)
+  ;; Set up sourcekit-lsp
+  (add-to-list 'eglot-server-programs '(swift-mode . ("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp")))
+  ;; Turn off breadcrumb
+  (setq lsp-headerline-breadcrumb-enable nil))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
