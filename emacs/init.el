@@ -44,6 +44,10 @@
 (ido-everywhere 1)
 (ido-ubiquitous-mode 1)
 
+;; compile
+(require 'compile)
+(global-set-key (kbd "C-c c") 'compile)
+
 ;; move text
 (nxt/require 'move-text)
 (global-set-key (kbd "M-p") 'move-text-up)
