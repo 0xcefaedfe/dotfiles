@@ -1,4 +1,11 @@
-;; set up meta key
+;; Brew stuff
+(add-to-list 'exec-path "/opt/homebrew/bin")
+
+;; Early initialization
+(setq package-enable-at-startup nil)
+(setq native-comp-async-report-warnings-errors nil)
+
+;; Set up meta key
 (cond
  ((eq system-type 'darwin)
   (setq mac-command-modifier 'meta)
@@ -6,152 +13,146 @@
  ((eq system-type 'gnu/linux)
   (setq x-alt-keysym 'meta)))
 
-;; set theme early
-(add-to-list 'default-frame-alist '(font . "RobotoMono NerdFont"))
-(add-to-list 'custom-theme-load-path ".")
-(load-theme 'gruber-darker t)
+;; Set theme and font
+(add-to-list 'default-frame-alist '(font . "Roboto Mono 14"))
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+(add-to-list 'load-path "~/.emacs.d/themes/")
 
-;; silence native compilation warnings
-(setq native-comp-async-report-warnings-errors nil)
+(require 'hercules-theme)
 
-(setq auto-save-default nil)
-(setq make-backup-files nil)
-(setq create-lockfiles nil)
-(setq completion-auto-help nil)
-(setq confirm-kill-emacs 'y-or-n-p)
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
-(setq visible-bell nil)
-(setq package--init-file-ensured t)
-(setq custom-file "~/.emacs.d/custom.el")
-(setq custom-safe-themes t)
+(let ((private-file "~/.emacs.d/private.el"))
+  (when (file-exists-p private-file)
+    (load private-file)))
+
+;; Basic settings
+(setq auto-save-default nil
+      make-backup-files nil
+      create-lockfiles nil
+      completion-auto-help nil
+      confirm-kill-emacs 'y-or-n-p
+      visible-bell nil
+      package--init-file-ensured t
+      custom-file "~/.emacs.d/custom.el"
+      custom-safe-themes t)
+
+(setq-default indent-tabs-mode nil
+              tab-width 2)
+
+(fido-mode 1)
+
+;; UTF-8 everywhere
 (prefer-coding-system       'utf-8)
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-language-environment   'utf-8)
 
-;; turn some modes on 
-(global-display-line-numbers-mode 1)
-(global-hl-line-mode 1)
-(delete-selection-mode)
-(global-auto-revert-mode t)
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; eye candy
-(tool-bar-mode 0)
-(menu-bar-mode 0)
-(scroll-bar-mode 0)
+;; UI settings
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
 (column-number-mode 1)
 (show-paren-mode 1)
+(global-display-line-numbers-mode 1)
+(global-hl-line-mode 1)
+(delete-selection-mode 1)
+(global-auto-revert-mode 1)
 
-;; function definitions
-(defvar nxt/package-contents-refreshed nil)
-
-(defun nxt/package-refresh-contents-once ()
-  (when (not nxt/package-contents-refreshed)
-    (setq nxt/package-contents-refreshed t)
-    (package-refresh-contents)))
-
-(defun nxt/require-one-package (package)
-  (when (not (package-installed-p package))
-    (nxt/package-refresh-contents-once)
-    (package-install package)))
-
-(defun nxt/require (&rest packages)
-  (dolist (package packages)
-    (nxt/require-one-package package)))
-
-;; initialize package management
-(package-initialize)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
-
-;; ido and smex
-(nxt/require 'smex 'ido-completing-read+)
-(require 'ido-completing-read+)
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
-(ido-mode 1)
-(ido-everywhere 1)
-(ido-ubiquitous-mode 1)
-
-;; compile
-(require 'compile)
+;; Global keybindings
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key (kbd "C-c c") 'compile)
+(global-set-key (kbd "M-p") 'transpose-lines)
+(global-set-key (kbd "M-n") (lambda () (interactive) (transpose-lines 1)))
 
-;; move text
-(nxt/require 'move-text)
-(global-set-key (kbd "M-p") 'move-text-up)
-(global-set-key (kbd "M-n") 'move-text-down)
+;; Package management
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
-;; company
-(nxt/require 'company)
-(require 'company)
-(global-company-mode)
+;; Use-package configuration
+(require 'use-package)
+(setq use-package-always-ensure t)
 
-;; multiple cursors
-(nxt/require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->")         'mc/mark-next-like-this)
-(global-set-key (kbd "C-<")         'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<")     'mc/mark-all-like-this)
-(global-set-key (kbd "C-\"")        'mc/skip-to-next-like-this)
-(global-set-key (kbd "C-:")         'mc/skip-to-previous-like-this)
+(use-package exec-path-from-shell
+  :ensure t
+  :config (exec-path-from-shell-initialize))
 
-;; dired
-(require 'dired-x)
-(setq dired-omit-files
-      (concat dired-omit-files "\\|^\\..+$"))
-(setq-default dired-dwim-target t)
-(setq dired-listing-switches "-alh")
+(use-package smex
+  :bind (("M-x" . smex)
+         ("C-c C-c M-x" . execute-extended-command)))
 
-;; tramp
-(setq tramp-auto-save-directory "/tmp")
+;; Company mode
+(use-package company
+  :hook (after-init . global-company-mode))
 
-;; magit
-(nxt/require 'magit)
+;; Multiple cursors
+(use-package multiple-cursors
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->"         . mc/mark-next-like-this)
+         ("C-<"         . mc/mark-previous-like-this)
+         ("C-c C-<"     . mc/mark-all-like-this)
+         ("C-\""        . mc/skip-to-next-like-this)
+         ("C-:"         . mc/skip-to-previous-like-this)))
 
-;; project.el
-(nxt/require 'project)
+;; Dired
+(use-package dired
+  :ensure nil
+  :config
+  (require 'dired-x)
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")
+        dired-dwim-target t
+        dired-listing-switches "-alh"))
 
-(nxt/require 'swift-mode)
-(nxt/require 'reformatter)
+;; Tramp
+(use-package tramp
+  :ensure nil
+  :config
+  (setq tramp-auto-save-directory "/tmp"))
+
+;; Magit
+(use-package magit
+  :commands magit-status)
+
+;; Project.el
+(use-package project
+  :ensure nil)
 
 ;; Swift mode
 (use-package swift-mode
-  :mode ("\\.swift\\;" . swift-mode)
+  :mode "\\.swift\\'"
+  :hook (swift-mode . swift-format-on-save-mode)
   :config
   (setq swift-mode:basic-offset 2)
-  (require 'reformatter)
-  (reformatter-define swift-format
-    :program "swift-format"
-    :args '("format"))
-  (add-hook 'swift-mode-hook 'swift-format-on-save-mode))
+  (use-package reformatter
+    :config
+    (reformatter-define swift-format
+      :program "/opt/homebrew/bin/swift-format"
+      :args '("format"))))
 
-;; LSP
+;; Eglot
 (use-package eglot
-  :hook
-  ;; Enable eglot for swift-mode
-  (swift-mode . eglot-ensure)
+  :ensure nil
+  :hook ((swift-mode . eglot-ensure)
+         (haskell-mode . eglot-ensure))
   :config
-    (fset #'jsonrpc--log-event #'ignore)
-  ;; Set up sourcekit-lsp
-  (add-to-list 'eglot-server-programs '(swift-mode . ("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp")))
-  ;; Turn off breadcrumb
-  (setq lsp-headerline-breadcrumb-enable nil))
+  (fset #'jsonrpc--log-event #'ignore)
+  (add-to-list 'eglot-server-programs 
+               '(swift-mode . ("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"))))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("e27c9668d7eddf75373fa6b07475ae2d6892185f07ebed037eedf783318761d7" default))
- '(package-selected-packages '(magit ido-completing-read+ smex)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(setq-default mode-line-format
+              '("%e" mode-line-modified " " mode-line-buffer-identification
+                "  " mode-line-position "  " mode-line-modes))
+
+(use-package copilot
+  :vc (:url "https://github.com/copilot-emacs/copilot.el")
+  :defer t
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+;; Load custom file if it exists
+(when (file-exists-p custom-file)
+  (load custom-file))
